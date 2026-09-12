@@ -1,195 +1,113 @@
-const DATA_FILES=['data/ancient.json','data/medieval.json','data/europe_v4.json','data/modern_v4.json'];
-const EVENTS=[
-  {year:-722,title:'Fall of the northern Kingdom of Israel',text:'Assyrian conquest destroys the northern kingdom. Judah remains a southern center while deportation and resettlement alter the population map.',major:true,source_key:'broshi_finkelstein_1992'},
-  {year:-586,title:'Jerusalem destroyed; Babylonian exile',text:'The Babylonian conquest sharply reduces Judah and creates an enduring eastern center of Jewish life in Babylonia.',major:true,source_key:'persian_judah'},
-  {year:70,title:'The Second Temple is destroyed',text:'Rome destroys Jerusalem and the Second Temple. Jewish life continues in the Land of Israel, while major diaspora centers remain active.',major:true,source_key:'cambridge_palestine'},
-  {year:1170,title:'Benjamin of Tudela records a dispersed Jewish world',text:'His itinerary offers rare city-level observations from Iberia to Mesopotamia. Baghdad is one of the largest communities he reports.',major:false,source_key:'benjamin_tudela'},
-  {year:1492,title:'Expulsion from Spain',text:'The Alhambra Decree accelerates a major Sephardi redistribution toward North Africa, Italy, the Ottoman world and later Western Europe.',major:true,source_key:'dellapergola_2001'},
-  {year:1648,title:'War devastates communities in the Polish–Lithuanian Commonwealth',text:'The Khmelnytsky uprising and associated wars destroy many communities, although Eastern Europe remains the demographic center of gravity.',major:false,source_key:'iijg_europe'},
-  {year:1772,title:'First Partition of Poland',text:'Russia, Prussia and Austria divide Polish–Lithuanian territory. Russia now acquires a much larger Jewish population in its western provinces.',major:true,source_key:'pale_1897'},
-  {year:1791,title:'The future Pale of Settlement begins to take shape',text:'A decree under Catherine II specifically permits Jewish residence in designated western provinces while restricting residence elsewhere in the empire.',major:true,source_key:'pale_1897'},
-  {year:1793,title:'Second Partition of Poland',text:'Another large transfer of Polish–Lithuanian territory brings still more Jewish communities under Russian imperial rule.',major:false,source_key:'pale_1897'},
-  {year:1795,title:'Third Partition ends the Polish–Lithuanian Commonwealth',text:'The final partition places most of the former Commonwealth’s Jewish population under Russia, Austria and Prussia.',major:true,source_key:'pale_1897'},
-  {year:1881,title:'Mass emigration from the Russian Empire accelerates',text:'Pogroms, restrictions and economic pressure help trigger a migration wave that will send roughly two million Jews out of the Russian Empire before World War I.',major:true,source_key:'pale_1897'},
-  {year:1882,title:'The May Laws deepen restrictions',text:'Temporary regulations restrict Jewish settlement and economic activity, reinforcing the geography and pressures of the Pale of Settlement.',major:false,source_key:'pale_1897'},
-  {year:1897,title:'4.48 million Jews counted inside the Pale',text:'The Russian Empire census records 4,483,300 Jews across the Pale of Settlement and Congress Poland — an extraordinary concentration across today’s Poland, Lithuania, Belarus, Ukraine and Moldova.',major:true,source_key:'pale_1897'},
-  {year:1903,title:'Kishinev pogrom',text:'The violence in Kishinev becomes an international symbol of the insecurity facing Jews in the late imperial Russian world and strengthens emigration and political mobilization.',major:false,source_key:'pale_1897'},
-  {year:1917,title:'The Pale of Settlement is abolished',text:'After the February Revolution, legal restrictions on Jewish residence are removed. The old Pale disappears as a legal institution, though its demographic geography persists.',major:true,source_key:'pale_1897'},
-  {year:1939,title:'Prewar demographic peak: 16.5 million',text:'World Jewry reaches about 16.5 million. Europe still contains the majority on the eve of the Holocaust and the German-Soviet invasion of Poland.',major:true,source_key:'dellapergola_2001'},
-  {year:1941,title:'The Holocaust expands eastward',text:'After Germany invades the Soviet Union, mass shootings and extermination policies destroy Jewish communities across Poland, the Baltics, Belarus, Ukraine and beyond.',major:true,source_key:'world_totals_1945_2014'},
-  {year:1945,title:'The world Jewish population has fallen to about 11 million',text:'Six million Jews have been murdered. Compared with 1939, the global Jewish population is roughly one-third smaller and the old European demographic center is shattered.',major:true,source_key:'world_totals_1945_2014'},
-  {year:1948,title:'State of Israel established',text:'Israel’s establishment and postwar migrations create a rapidly growing new demographic pole, alongside the United States.',major:true,source_key:'dellapergola_2001'},
-  {year:1970,title:'Soviet Jewish emigration and the refusenik era',text:'Pressure to emigrate grows. In the 1970s significant numbers leave the USSR, while many applicants are refused exit visas and become known as refuseniks.',major:false,source_key:'fsu_emigration'},
-  {year:1989,title:'The Soviet exit gates open',text:'Liberalization produces a sudden surge in emigration. In 1989 about 56,000 Soviet Jewish emigrants went to the United States and about 12,900 to Israel.',major:true,source_key:'fsu_emigration'},
-  {year:1990,title:'Mass aliyah from the Soviet Union',text:'About 185,200 Soviet Jewish emigrants arrive in Israel in 1990 alone, rapidly changing Israel’s population and the geography of the former Soviet Jewish world.',major:true,source_key:'fsu_emigration'},
-  {year:1991,title:'The USSR collapses amid continuing mass migration',text:'Israel receives about 147,800 more emigrants from the former Soviet Union in 1991; the United States and Germany also receive substantial flows.',major:true,source_key:'fsu_emigration'}
+const LINEAGE_FILES=[
+  'data/lineages/judean.json','data/lineages/babylonian_iraqi.json','data/lineages/romaniote_hellenistic.json',
+  'data/lineages/ashkenazi.json','data/lineages/sephardi.json','data/lineages/maghrebi_mizrahi.json',
+  'data/lineages/persian_central_asian.json','data/lineages/yemenite.json','data/lineages/beta_israel.json'
 ];
+const DOT_VALUE=1000;
+const TIMELINE_YEARS=[-800,-722,-586,-450,-300,50,70,500,900,1170,1490,1492,1500,1600,1648,1750,1772,1791,1795,1850,1881,1897,1903,1914,1917,1930,1939,1942,1945,1948,1951,1960,1970,1984,1989,1991,2000,2024];
 
 const $=s=>document.querySelector(s);
 const stage=$('#stage'),worldSvg=d3.select('#world'),labelsSvg=d3.select('#labels'),canvas=$('#dots'),ctx=canvas.getContext('2d');
-const slider=$('#slider'),playBtn=$('#play'),yearEl=$('#year'),totalTitle=$('#totalTitle'),totalNumber=$('#totalNumber'),totalBar=$('#totalBar'),totalMeta=$('#totalMeta'),qualityEl=$('#quality');
-const story=$('#story'),storyKicker=$('#storyKicker'),storyTitle=$('#storyTitle'),storyText=$('#storyText'),sourceLink=$('#source'),topCenters=$('#topCenters'),coverageEl=$('#coverage');
-const legend=$('#legend'),anchorLabels=$('#anchorLabels'),eventDots=$('#eventDots'),counter=$('#counter'),interpEl=$('#interp'),popSpark=d3.select('#popSpark');
-let config,snapshots=[],worldFeature,projection,path,baseW=0,baseH=0,dpr=1,autoFocus=true,hidden=new Set(),playing=false,raf=null,lastTs=0,holdUntil=0,heldEvents=new Set();
-let clusterCache=new Map();
-const PEAK=16500000;
-const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
-const mix=(a,b,t)=>a+(b-a)*t;
-const fmt=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(n);
-const formatYear=y=>y<0?`${Math.abs(Math.round(y))} BCE`:`${Math.max(1,Math.round(y))} CE`;
+const slider=$('#slider'),playBtn=$('#play'),yearEl=$('#year'),totalNumber=$('#totalNumber'),totalBar=$('#totalBar'),totalMeta=$('#totalMeta'),qualityEl=$('#quality'),story=$('#story'),storyKicker=$('#storyKicker'),storyTitle=$('#storyTitle'),storyText=$('#storyText'),topCenters=$('#topCenters'),coverageEl=$('#coverage'),sourceLink=$('#source'),legend=$('#legend'),counter=$('#counter'),eventDots=$('#eventDots'),anchorLabels=$('#anchorLabels'),interpEl=$('#interp'),spark=$('#popSpark');
+let meta,lineages=[],worldFeature,projection,path,baseW=0,baseH=0,dpr=1,autoFocus=true,playing=false,raf=null,lastTs=0,pauseUntil=0,lastEventKey='',hidden=new Set(),positionCache=new Map();
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),mix=(a,b,t)=>a+(b-a)*t,smooth=t=>t*t*(3-2*t);
+const fmt=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(Math.round(n));
+const formatYear=y=>y<0?`${Math.abs(Math.round(y))} BCE`:`${Math.round(y)} CE`;
+
+function hash32(str){let h=2166136261>>>0;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function rnd(seed){let x=seed>>>0;x^=x<<13;x^=x>>>17;x^=x<<5;return (x>>>0)/4294967296}
+function chooseCenter(centers,u){let acc=0;for(let i=0;i<centers.length;i++){acc+=centers[i].share||0;if(u<=acc||i===centers.length-1)return {center:centers[i],index:i}}return {center:centers[0],index:0}}
 
 async function load(){
-  const [cfg,...parts]=await Promise.all([
-    fetch('data/config.json').then(r=>r.json()),
-    ...DATA_FILES.map(f=>fetch(f).then(r=>r.json())),
+  const [metaData,...rest]=await Promise.all([
+    fetch('data/lineages/meta.json').then(r=>r.json()),
+    ...LINEAGE_FILES.map(f=>fetch(f).then(r=>r.json())),
     fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r=>r.json())
   ]);
-  config=cfg;
-  const atlas=parts.pop();
-  snapshots=parts.flat().sort((a,b)=>a.year-b.year);
-  worldFeature=topojson.feature(atlas,atlas.objects.countries);
-  slider.max=(snapshots.length-1)*1000;
-  buildTimeline();
-  resize();
-  render(0);
-  $('#loading').classList.add('done');
+  const atlas=rest.pop();meta=metaData;lineages=rest;worldFeature=topojson.feature(atlas,atlas.objects.countries);
+  for(const l of lineages)l.maxDots=Math.ceil(Math.max(...l.keyframes.map(k=>k.population||0))/DOT_VALUE);
+  slider.min=0;slider.max=(TIMELINE_YEARS.length-1)*1000;slider.value=0;
+  buildTimeline();buildLegend();drawSpark();resize();render(0);$('#loading').classList.add('done');
 }
 
-function parseWorldTotal(s){
-  if(Number.isFinite(+s.world_total)&&+s.world_total>0)return +s.world_total;
-  const text=s.total_label||'';
-  if(!/world/i.test(text))return null;
-  let m=text.match(/(?:~|about\s*)?([\d.]+)\s*m/i);if(m)return +m[1]*1e6;
-  m=text.match(/([\d,.]+)\s*(?:million)/i);if(m)return +m[1].replace(/,/g,'')*1e6;
-  return null;
-}
-function mappedTotal(s){return s.points.reduce((sum,p)=>sum+(Number.isFinite(+p.population)?+p.population:0),0)}
-function formatMillions(v){if(!Number.isFinite(v))return '—';return `${(v/1e6).toFixed(v>=1e7?2:2)}m`}
+function yearForPos(pos){const raw=clamp(+pos/1000,0,TIMELINE_YEARS.length-1),i=Math.min(Math.floor(raw),TIMELINE_YEARS.length-2),t=raw-i;return mix(TIMELINE_YEARS[i],TIMELINE_YEARS[i+1],t)}
+function posForYear(year){if(year<=TIMELINE_YEARS[0])return 0;if(year>=TIMELINE_YEARS.at(-1))return +slider.max;for(let i=0;i<TIMELINE_YEARS.length-1;i++){const a=TIMELINE_YEARS[i],b=TIMELINE_YEARS[i+1];if(year>=a&&year<=b)return i*1000+(year-a)/(b-a)*1000}return 0}
+function worldPopulationAt(year){const a=meta.world_totals;if(year<=a[0].year)return a[0].population;if(year>=a.at(-1).year)return a.at(-1).population;for(let i=0;i<a.length-1;i++){if(year>=a[i].year&&year<=a[i+1].year){const t=(year-a[i].year)/(a[i+1].year-a[i].year);return mix(a[i].population,a[i+1].population,t)}}return a.at(-1).population}
 
-function buildTimeline(){
-  anchorLabels.innerHTML=snapshots.map((s,i)=>`<span style="left:${i/(snapshots.length-1)*100}%">${s.label.replace('c. ','')}</span>`).join('');
-  eventDots.innerHTML=EVENTS.map(e=>`<i class="${e.major?'major':''}" style="left:${positionForYear(e.year)/slider.max*100}%" title="${e.year<0?Math.abs(e.year)+' BCE':e.year}: ${e.title}"></i>`).join('');
-  buildPopulationSpark();
-}
-function buildPopulationSpark(){
-  const pts=snapshots.map((s,i)=>({x:i/(snapshots.length-1)*1000,t:parseWorldTotal(s)}));
-  const y=v=>45-clamp(v/PEAK,0,1)*38;
-  const line=d3.line().defined(d=>d.t!=null).x(d=>d.x).y(d=>y(d.t)).curve(d3.curveMonotoneX);
-  popSpark.selectAll('*').remove();
-  popSpark.append('path').datum(pts).attr('class','line').attr('d',line);
-  const peak=pts.reduce((best,p)=>p.t>(best?.t||0)?p:best,null);
-  if(peak)popSpark.append('circle').attr('class','peak').attr('cx',peak.x).attr('cy',y(peak.t)).attr('r',2.8).append('title').text(`Peak ${formatMillions(peak.t)}`);
-}
-function positionForYear(y){
-  if(y<=snapshots[0].year)return 0;if(y>=snapshots.at(-1).year)return (snapshots.length-1)*1000;
-  for(let i=0;i<snapshots.length-1;i++){const a=snapshots[i].year,b=snapshots[i+1].year;if(y>=a&&y<=b)return i*1000+(y-a)/(b-a)*1000}return 0;
-}
-function segment(pos){const raw=clamp(pos/1000,0,snapshots.length-1),i=Math.min(Math.floor(raw),snapshots.length-2),t=raw-i;return{i,t,a:snapshots[i],b:snapshots[i+1]}}
-function yearAt(pos){if(+pos>=+slider.max)return snapshots.at(-1).year;const {a,b,t}=segment(+pos);return mix(a.year,b.year,t)}
+function lineageState(lineage,year){const ks=lineage.keyframes,lead=180;if(year<ks[0].year-lead)return {population:0,a:ks[0],b:ks[0],t:0,birth:0};if(year<ks[0].year){const t=(year-(ks[0].year-lead))/lead;return {population:ks[0].population*smooth(t),a:ks[0],b:ks[0],t:0,birth:smooth(t)}};if(year>=ks.at(-1).year)return {population:ks.at(-1).population,a:ks.at(-1),b:ks.at(-1),t:0,birth:1};for(let i=0;i<ks.length-1;i++){const a=ks[i],b=ks[i+1];if(year>=a.year&&year<=b.year){const t=(year-a.year)/(b.year-a.year),q=smooth(t);return {population:mix(a.population,b.population,q),a,b,t:q,birth:1,ia:i,ib:i+1}}}return {population:0,a:ks[0],b:ks[0],t:0,birth:0}}
 
-function resize(){
-  const r=stage.getBoundingClientRect();baseW=r.width;baseH=r.height;dpr=Math.min(window.devicePixelRatio||1,2);
-  canvas.width=Math.round(baseW*dpr);canvas.height=Math.round(baseH*dpr);canvas.style.width=baseW+'px';canvas.style.height=baseH+'px';ctx.setTransform(dpr,0,0,dpr,0,0);
-  worldSvg.attr('viewBox',`0 0 ${baseW} ${baseH}`);labelsSvg.attr('viewBox',`0 0 ${baseW} ${baseH}`);
-  projection=d3.geoNaturalEarth1().fitExtent([[16,14],[baseW-16,baseH-14]],worldFeature);path=d3.geoPath(projection);clusterCache.clear();drawWorld();render(+slider.value);
-}
-function drawWorld(){
-  worldSvg.selectAll('*').remove();const g=worldSvg.append('g').attr('id','mapLayer');
-  g.append('path').datum({type:'Sphere'}).attr('d',path).attr('class','ocean');g.append('path').datum(d3.geoGraticule10()).attr('d',path).attr('class','graticule');g.append('path').datum(worldFeature).attr('d',path).attr('class','land');
-}
-function metric(p){return Number.isFinite(+p.population)&&+p.population>0?+p.population:(+p.weight||0)*1000}
-function snapshotCamera(s){
-  if(!autoFocus)return{k:1,tx:0,ty:0};const max=Math.max(...s.points.map(metric),1);
-  const pts=s.points.filter(p=>metric(p)>=max*.018).map(p=>projection([p.lon,p.lat])).filter(Boolean);if(!pts.length)return{k:1,tx:0,ty:0};
-  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);let minX=Math.min(...xs),maxX=Math.max(...xs),minY=Math.min(...ys),maxY=Math.max(...ys);
-  const spanX=Math.max(76,maxX-minX),spanY=Math.max(52,maxY-minY);const k=clamp(Math.min((baseW*.72)/spanX,(baseH*.65)/spanY),1,3.5);const cx=(minX+maxX)/2,cy=(minY+maxY)/2;
-  return{k,tx:baseW/2-k*cx,ty:baseH/2-k*cy};
-}
-function cameraAt(a,b,t){const ca=snapshotCamera(a),cb=snapshotCamera(b),q=t*t*(3-2*t);return{k:mix(ca.k,cb.k,q),tx:mix(ca.tx,cb.tx,q),ty:mix(ca.ty,cb.ty,q)}}
-function screenPoint(p,c){const xy=projection([p.lon,p.lat]);return xy?[xy[0]*c.k+c.tx,xy[1]*c.k+c.ty]:null}
+function totalLineageRaw(year){return lineages.reduce((s,l)=>s+lineageState(l,year).population,0)}
+function populationScale(year){const raw=totalLineageRaw(year),world=worldPopulationAt(year);return raw>0?world/raw:1}
 
-function hashString(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
-function rng32(seed){return()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296}}
-function spreadPixels(p,count){
-  const center=projection([p.lon,p.lat]);if(!center)return[5,4];const pr=String(p.precision||'');
-  if(pr.includes('city')||pr.includes('site')){const r=clamp(3.5+Math.sqrt(Math.max(1,count))*.58,4,27);return[r,r*.72]}
-  let slon=+p.spread_lon||0,slat=+p.spread_lat||0,f=1;
-  if(pr.includes('governorate')){slon=slon||1.4;slat=slat||1;f=1}
-  else if(pr.includes('republic')){slon=slon||2.7;slat=slat||1.8;f=1.7}
-  else if(pr.includes('country')){slon=slon||3.2;slat=slat||2.1;f=1.65}
-  else if(pr.includes('region')||pr.includes('reconstruction')){slon=slon||5;slat=slat||3.3;f=3.2}
-  else{slon=1;slat=.7}
-  const ex=projection([+p.lon+slon*f,+p.lat]),ey=projection([+p.lon,+p.lat+slat*f]);
-  return[clamp(Math.abs((ex?.[0]??center[0]+8)-center[0]),5,95),clamp(Math.abs((ey?.[1]??center[1]+6)-center[1]),4,70)];
-}
-function clusterFor(p){
-  const quantum=+config.dot_quantum||1000,pop=+p.population;if(!(pop>0))return null;
-  const key=`${p.id}|${pop}|${baseW}|${baseH}`;if(clusterCache.has(key))return clusterCache.get(key);
-  const center=projection([p.lon,p.lat]);if(!center)return null;const full=Math.floor(pop/quantum),frac=(pop%quantum)/quantum,count=full+(frac>.08?1:0);const [rx,ry]=spreadPixels(p,count);const rnd=rng32(hashString(key)),dots=[];
-  for(let i=0;i<count;i++){
-    const a=Math.PI*2*rnd(),rad=Math.sqrt(rnd()),jitter=.86+.28*rnd();dots.push({x:center[0]+Math.cos(a)*rx*rad*jitter,y:center[1]+Math.sin(a)*ry*rad*jitter,f:i===count-1&&frac>.08&&i>=full?frac:1});
+function landPoint(lineage,kf,index){
+  const key=`${lineage.id}:${kf.year}:${index}`;if(positionCache.has(key))return positionCache.get(key);
+  const seed=hash32(key),u=rnd(seed),pick=chooseCenter(kf.centers,u),c=pick.center;
+  let chosen=[c.lon,c.lat];
+  for(let a=0;a<18;a++){
+    const s1=hash32(`${key}:a:${a}`),s2=hash32(`${key}:b:${a}`);
+    const ang=rnd(s1)*Math.PI*2,rr=Math.sqrt(rnd(s2))*c.spread;
+    const lat=c.lat+Math.sin(ang)*rr;
+    const lon=c.lon+Math.cos(ang)*rr/Math.max(.32,Math.cos(c.lat*Math.PI/180));
+    const candidate=[lon,lat];
+    if(d3.geoContains(worldFeature,candidate)){chosen=candidate;break}
   }
-  clusterCache.set(key,dots);return dots;
-}
-function drawSnapshot(s,alpha,c){
-  if(alpha<.005)return;ctx.save();
-  for(const p of s.points){
-    if(hidden.has(p.tradition))continue;const def=config.traditions[p.tradition]||{color:'#777'};const dots=clusterFor(p);
-    if(dots){ctx.fillStyle=def.color;ctx.globalAlpha=alpha*(p.confidence==='low'?.52:p.confidence==='medium'?.72:.88);ctx.beginPath();
-      for(const d of dots){const x=d.x*c.k+c.tx,y=d.y*c.k+c.ty,r=clamp(1.2*Math.sqrt(d.f)*Math.sqrt(c.k),.55,2.15);if(x<-4||x>baseW+4||y<-4||y>baseH+4)continue;ctx.moveTo(x+r,y);ctx.arc(x,y,r,0,Math.PI*2)}ctx.fill();
-    }else{
-      const xy=screenPoint(p,c);if(!xy)continue;const r=clamp(5+Math.sqrt(+p.weight||4)*.7,6,17)*Math.sqrt(c.k);ctx.globalAlpha=alpha*(p.confidence==='low'?.45:.65);ctx.strokeStyle=def.color;ctx.lineWidth=1.2;ctx.setLineDash([3,3]);ctx.beginPath();ctx.arc(xy[0],xy[1],r,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
-    }
-  }ctx.restore();
+  positionCache.set(key,chosen);return chosen
 }
 
-function drawLabels(s,c){
-  labelsSvg.selectAll('*').remove();const candidates=[...s.points].sort((a,b)=>metric(b)-metric(a)),chosen=[];
-  for(const p of candidates){if(hidden.has(p.tradition))continue;const xy=screenPoint(p,c);if(!xy||xy[0]<22||xy[0]>baseW-22||xy[1]<20||xy[1]>baseH-20)continue;const tooClose=chosen.some(q=>Math.hypot(q.xy[0]-xy[0],q.xy[1]-xy[1])<64);if(!tooClose){chosen.push({p,xy});if(chosen.length>=10)break}}
-  const g=labelsSvg.append('g').attr('class','labels-layer');for(const {p,xy} of chosen){const def=config.traditions[p.tradition]||{color:'#777'};const item=g.append('g').attr('class','place-label').attr('transform',`translate(${xy[0]},${xy[1]})`);item.append('circle').attr('r',3).attr('fill',p.population?def.color:'#fff').attr('stroke',def.color).attr('stroke-width',1.4);item.append('text').attr('x',7).attr('y',3).text(p.name);item.append('title').text(`${p.name}${p.population?` — ${fmt(p.population)}`:' — presence/reconstruction'}`)}
-}
-function currentCategories(a,b){
-  const ids=new Set([...a.points,...b.points].map(p=>p.tradition));legend.innerHTML=[...ids].filter(id=>config.traditions[id]).map(id=>`<button data-id="${id}" class="${hidden.has(id)?'off':''}"><i style="background:${config.traditions[id].color}"></i>${config.traditions[id].label}</button>`).join('')+`<button disabled><span class="ring-key"></span>uncounted presence</button>`;
-  legend.querySelectorAll('button[data-id]').forEach(btn=>btn.onclick=()=>{const id=btn.dataset.id;hidden.has(id)?hidden.delete(id):hidden.add(id);render(+slider.value)});
-}
-function nearestEvent(pos){const arr=EVENTS.map(e=>({...e,pos:positionForYear(e.year)})).sort((x,y)=>Math.abs(x.pos-pos)-Math.abs(y.pos-pos));const e=arr[0];return e&&Math.abs(e.pos-pos)<58?e:null}
-
-function totalState(a,b,q){
-  const ta=parseWorldTotal(a),tb=parseWorldTotal(b);if(ta!=null&&tb!=null)return{value:mix(ta,tb,q),world:true,interpolated:q>.02&&q<.98};
-  const s=q<.5?a:b,t=parseWorldTotal(s);if(t!=null)return{value:t,world:true,interpolated:false};
-  if(s.year===-800)return{value:mappedTotal(s),world:false,interpolated:false,title:'Estimated Israelite/Judahite population'};
-  return{value:null,world:false,interpolated:false,title:'World total not defensibly known'};
-}
-function updatePopulation(a,b,q,dominant){
-  const state=totalState(a,b,q);totalTitle.textContent=state.title||(state.world?'World Jewish population':'Population represented by source');
-  if(state.value==null){totalNumber.textContent='—';totalBar.style.width='0%';totalMeta.textContent='The source supports locations, but not a defensible global headcount.';return}
-  totalNumber.textContent=`${state.interpolated?'≈ ':dominant.world_total_approx?'≈ ':''}${formatMillions(state.value)}`;totalBar.style.width=`${clamp(state.value/PEAK*100,0,100)}%`;
-  const mt=mappedTotal(dominant),wt=parseWorldTotal(dominant);let meta=state.interpolated?'Visual interpolation between source totals. ':'';
-  if(wt){const pct=clamp(mt/wt*100,0,100);meta+=`Numeric dots localize ${formatMillions(mt)} (${pct.toFixed(0)}%) of this source total.`}
-  else meta+=dominant.total_label||'';
-  const idx=snapshots.indexOf(dominant);if(wt&&idx>0){let prev=null;for(let i=idx-1;i>=0;i--){const t=parseWorldTotal(snapshots[i]);if(t!=null){prev={s:snapshots[i],t};break}}if(prev){const d=(wt-prev.t)/prev.t*100;if(Math.abs(d)>4)meta+=` ${d<0?'▼':'▲'} ${Math.abs(d).toFixed(1)}% vs ${prev.s.label}.`}}
-  totalMeta.textContent=meta;
+function pointFor(lineage,state,index){
+  const pa=landPoint(lineage,state.a,index),pb=landPoint(lineage,state.b,index);
+  if(state.a.year===state.b.year)return {lon:pa[0],lat:pa[1],alpha:1};
+  const d=Math.hypot(pb[0]-pa[0],pb[1]-pa[1]);
+  if(d<6){const lon=mix(pa[0],pb[0],state.t),lat=mix(pa[1],pb[1],state.t);return d3.geoContains(worldFeature,[lon,lat])?{lon,lat,alpha:1}:{lon:state.t<.5?pa[0]:pb[0],lat:state.t<.5?pa[1]:pb[1],alpha:1}}
+  if(state.t<.5)return {lon:pa[0],lat:pa[1],alpha:1-state.t*1.7};
+  return {lon:pb[0],lat:pb[1],alpha:(state.t-.5)*1.7+.15}
 }
 
-function render(pos){
-  if(!snapshots.length||!projection)return;const {a,b,t}=segment(pos),q=t*t*(3-2*t),y=yearAt(pos),c=cameraAt(a,b,q),dominant=q<.5?a:b;
-  worldSvg.select('#mapLayer').attr('transform',`translate(${c.tx},${c.ty}) scale(${c.k})`);ctx.clearRect(0,0,baseW,baseH);drawSnapshot(a,1-q,c);drawSnapshot(b,q,c);drawLabels(dominant,c);
-  yearEl.textContent=formatYear(y);counter.textContent=formatYear(y);qualityEl.textContent=dominant.quality;interpEl.textContent=(q<.035||q>.965)?'source snapshot':`visual interpolation · ${a.label} → ${b.label}`;updatePopulation(a,b,q,dominant);
-  const ev=nearestEvent(pos);story.classList.toggle('event',!!ev);storyKicker.textContent=ev?'Historical event':dominant.label;storyTitle.textContent=ev?ev.title:dominant.headline;storyText.textContent=ev?ev.text:dominant.caveat;
-  const sourceKey=ev?.source_key||dominant.source_key,src=config.sources[sourceKey];sourceLink.href=src?.url||'#';sourceLink.textContent=src?`${src.author} ↗`:'Source ↗';
-  const wt=parseWorldTotal(dominant),mt=mappedTotal(dominant);coverageEl.textContent=wt?`${clamp(mt/wt*100,0,100).toFixed(0)}% numerically localized`:dominant.quality;updateTopCenters(dominant);currentCategories(a,b);
-}
-function updateTopCenters(s){
-  const top=[...s.points].filter(p=>!hidden.has(p.tradition)).sort((a,b)=>metric(b)-metric(a)).slice(0,5);topCenters.innerHTML=top.map(p=>{const def=config.traditions[p.tradition]||{color:'#777'},value=p.population?fmt(p.population):'uncounted';return `<div><i style="background:${def.color}"></i><span>${p.name}</span><b>${value}</b></div>`}).join('');
+function activeDots(lineage,state,scale){return Math.max(0,state.population*scale/DOT_VALUE)}
+
+function cameraFor(year){
+  if(!autoFocus)return {k:1,tx:0,ty:0};
+  const pts=[];const scale=populationScale(year);
+  for(const l of lineages){const st=lineageState(l,year),n=activeDots(l,st,scale);if(n<10)continue;const k=st.t<.5?st.a:st.b;for(const c of k.centers){if(c.share*n>=10){const p=projection([c.lon,c.lat]);if(p)pts.push(p)}}}
+  if(!pts.length)return {k:1,tx:0,ty:0};
+  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),spanX=Math.max(90,Math.max(...xs)-Math.min(...xs)),spanY=Math.max(70,Math.max(...ys)-Math.min(...ys));
+  const k=clamp(Math.min((baseW*.73)/spanX,(baseH*.70)/spanY),1,3.1),cx=(Math.min(...xs)+Math.max(...xs))/2,cy=(Math.min(...ys)+Math.max(...ys))/2;
+  return {k,tx:baseW/2-k*cx,ty:baseH/2-k*cy}
 }
 
-$('#focusBtn').onclick=()=>{autoFocus=!autoFocus;$('#focusBtn').classList.toggle('active',autoFocus);render(+slider.value)};
-slider.addEventListener('input',()=>render(+slider.value));window.addEventListener('resize',()=>{clearTimeout(window.__rt);window.__rt=setTimeout(resize,100)});
-function playLoop(ts){
-  if(!playing)return;if(holdUntil&&ts<holdUntil){lastTs=ts;raf=requestAnimationFrame(playLoop);return}if(!lastTs)lastTs=ts;const dt=Math.min(80,ts-lastTs);lastTs=ts;const old=+slider.value;let next=old+dt*.09;
-  const crossed=EVENTS.map(e=>({...e,pos:positionForYear(e.year)})).filter(e=>e.pos>old&&e.pos<=next&&!heldEvents.has(e.year)).sort((a,b)=>a.pos-b.pos)[0];
-  if(crossed){slider.value=crossed.pos;render(crossed.pos);heldEvents.add(crossed.year);holdUntil=ts+(crossed.major?2600:1700);raf=requestAnimationFrame(playLoop);return}
-  if(next>+slider.max){next=0;heldEvents.clear()}slider.value=next;render(next);raf=requestAnimationFrame(playLoop);
+function resize(){const r=stage.getBoundingClientRect();baseW=r.width;baseH=r.height;dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(baseW*dpr);canvas.height=Math.round(baseH*dpr);canvas.style.width=baseW+'px';canvas.style.height=baseH+'px';ctx.setTransform(dpr,0,0,dpr,0,0);worldSvg.attr('viewBox',`0 0 ${baseW} ${baseH}`);labelsSvg.attr('viewBox',`0 0 ${baseW} ${baseH}`);projection=d3.geoNaturalEarth1().fitExtent([[15,12],[baseW-15,baseH-12]],worldFeature);path=d3.geoPath(projection);drawWorld();render(+slider.value)}
+function drawWorld(){worldSvg.selectAll('*').remove();const g=worldSvg.append('g').attr('id','mapLayer');g.append('path').datum({type:'Sphere'}).attr('d',path).attr('class','ocean');g.append('path').datum(d3.geoGraticule10()).attr('d',path).attr('class','graticule');g.append('path').datum(worldFeature).attr('d',path).attr('class','land')}
+
+function drawDots(year,camera){
+  ctx.clearRect(0,0,baseW,baseH);const scale=populationScale(year);let drawn=0;
+  for(const l of lineages){if(hidden.has(l.id))continue;const st=lineageState(l,year),count=activeDots(l,st,scale);if(count<=0)continue;const full=Math.floor(count),frac=count-full;ctx.fillStyle=l.color;
+    for(let i=0;i<Math.min(full,l.maxDots);i++){const p=pointFor(l,st,i),xy=projection([p.lon,p.lat]);if(!xy)continue;const x=xy[0]*camera.k+camera.tx,y=xy[1]*camera.k+camera.ty;if(x<-5||y<-5||x>baseW+5||y>baseH+5)continue;ctx.globalAlpha=.74*p.alpha;ctx.beginPath();ctx.arc(x,y,Math.max(1.15,1.35*Math.sqrt(camera.k)),0,Math.PI*2);ctx.fill();drawn++}
+    if(frac>.08&&full<l.maxDots){const p=pointFor(l,st,full),xy=projection([p.lon,p.lat]);if(xy){ctx.globalAlpha=.74*frac*p.alpha;ctx.beginPath();ctx.arc(xy[0]*camera.k+camera.tx,xy[1]*camera.k+camera.ty,Math.max(1.15,1.35*Math.sqrt(camera.k)),0,Math.PI*2);ctx.fill()}}
+  }
+  ctx.globalAlpha=1;return drawn
 }
-playBtn.onclick=()=>{playing=!playing;playBtn.textContent=playing?'❚❚':'▶';lastTs=0;holdUntil=0;if(playing)raf=requestAnimationFrame(playLoop);else cancelAnimationFrame(raf)};
+
+function buildLabels(year,camera){labelsSvg.selectAll('*').remove();const entries=[];for(const l of lineages){if(hidden.has(l.id))continue;const st=lineageState(l,year),pop=st.population*populationScale(year);if(pop<18000)continue;const k=st.t<.5?st.a:st.b;for(const c of k.centers)entries.push({name:c.name,score:pop*c.share,color:l.color,lon:c.lon,lat:c.lat})}
+  entries.sort((a,b)=>b.score-a.score);const chosen=[];for(const e of entries){const q=projection([e.lon,e.lat]);if(!q)continue;const xy=[q[0]*camera.k+camera.tx,q[1]*camera.k+camera.ty];if(xy[0]<20||xy[0]>baseW-20||xy[1]<20||xy[1]>baseH-20)continue;if(chosen.some(z=>Math.hypot(z.xy[0]-xy[0],z.xy[1]-xy[1])<62))continue;chosen.push({...e,xy});if(chosen.length>=10)break}
+  const g=labelsSvg.append('g');for(const e of chosen){const it=g.append('g').attr('class','place-label').attr('transform',`translate(${e.xy[0]},${e.xy[1]})`);it.append('circle').attr('r',3).attr('fill',e.color).attr('stroke','#fff').attr('stroke-width',1.2);it.append('text').attr('x',7).attr('y',3).text(e.name)}
+}
+
+function buildLegend(){legend.innerHTML=lineages.map(l=>`<button data-id="${l.id}"><i style="background:${l.color}"></i>${l.label}</button>`).join('');legend.querySelectorAll('button').forEach(b=>b.onclick=()=>{const id=b.dataset.id;hidden.has(id)?hidden.delete(id):hidden.add(id);b.classList.toggle('off',hidden.has(id));render(+slider.value)})}
+
+function nearestEvent(pos){const arr=meta.events.map(e=>({...e,d:Math.abs(posForYear(e.year)-pos)})).sort((a,b)=>a.d-b.d);return arr[0]&&arr[0].d<185?arr[0]:null}
+function topLineages(year){const scale=populationScale(year);return lineages.map(l=>({l,p:lineageState(l,year).population*scale})).filter(x=>x.p>5000&&!hidden.has(x.l.id)).sort((a,b)=>b.p-a.p).slice(0,6)}
+
+function render(pos){if(!worldFeature||!projection)return;const year=yearForPos(pos),camera=cameraFor(year);worldSvg.select('#mapLayer').attr('transform',`translate(${camera.tx},${camera.ty}) scale(${camera.k})`);drawDots(year,camera);buildLabels(year,camera);
+  const total=worldPopulationAt(year),peak=16500000;yearEl.textContent=formatYear(year);counter.textContent=formatYear(year);totalNumber.textContent=fmt(total);totalBar.style.width=`${clamp(total/peak*100,0,100)}%`;const delta=(total-peak)/peak*100;totalMeta.textContent=year>=1939&&year<=1951?`${delta.toFixed(0)}% vs. 1939 peak · visual reconstruction`:year<1490?'Ancient/medieval distribution is a visual reconstruction':'World total series with lineage reconstruction below';qualityEl.textContent=year<1490?'Hypothesis-driven locality model · locations constrained to land':'Community-lineage reconstruction · 1 dot = 1,000 people';interpEl.textContent='continuous lineage reconstruction';
+  const ev=nearestEvent(pos);story.classList.toggle('event',!!ev);storyKicker.textContent=ev?'Historical event':'Community movement';storyTitle.textContent=ev?ev.title:'Jewish communities diverge, migrate and reconverge';storyText.textContent=ev?ev.text:'Colors persist across time so the same community traditions can be followed as their demographic centers move. Modern Israel is shown as a convergence of multiple lineages rather than a single replacement category.';
+  topCenters.innerHTML=topLineages(year).map(({l,p})=>`<div><i style="background:${l.color}"></i><span>${l.label}</span><b>${fmt(p)}</b></div>`).join('');coverageEl.textContent='Synthetic lineage model · dots remain on land at each demographic state';sourceLink.href='https://github.com/apotapov57/jewish-population-atlas';sourceLink.textContent='Methodology ↗';
+  const eventKey=ev?`${ev.year}:${ev.title}`:'';if(playing&&ev?.major&&eventKey&&eventKey!==lastEventKey){pauseUntil=performance.now()+1450;lastEventKey=eventKey}
+}
+
+function buildTimeline(){eventDots.innerHTML=meta.events.map(e=>`<i class="${e.major?'major':''}" style="left:${posForYear(e.year)/slider.max*100}%" title="${e.title}"></i>`).join('');const labels=[-800,-450,50,500,1170,1490,1750,1850,1897,1939,1945,1951,1989,2024];anchorLabels.innerHTML=labels.map(y=>`<span style="left:${posForYear(y)/slider.max*100}%">${formatYear(y).replace(' CE','').replace(' BCE',' BCE')}</span>`).join('')}
+function drawSpark(){const totals=meta.world_totals,max=d3.max(totals,d=>d.population);const x=y=>posForYear(y)/slider.max*1000,y=p=>44-p/max*38;const line=d3.line().x(d=>x(d.year)).y(d=>y(d.population)).curve(d3.curveMonotoneX),area=d3.area().x(d=>x(d.year)).y0(46).y1(d=>y(d.population)).curve(d3.curveMonotoneX);spark.innerHTML=`<path class="area" d="${area(totals)}"></path><path class="line" d="${line(totals)}"></path><circle class="peak" cx="${x(1939)}" cy="${y(16500000)}" r="2.7"></circle>`}
+
+function playLoop(ts){if(!playing)return;if(ts<pauseUntil){raf=requestAnimationFrame(playLoop);return}if(!lastTs)lastTs=ts;const dt=ts-lastTs;lastTs=ts;let v=+slider.value+dt*.075;if(v>+slider.max){v=0;lastEventKey=''}slider.value=v;render(v);raf=requestAnimationFrame(playLoop)}
+playBtn.onclick=()=>{playing=!playing;playBtn.textContent=playing?'❚❚':'▶';lastTs=0;pauseUntil=0;if(playing)raf=requestAnimationFrame(playLoop);else cancelAnimationFrame(raf)};
+slider.addEventListener('input',()=>{lastEventKey='';render(+slider.value)});$('#focusBtn').onclick=()=>{autoFocus=!autoFocus;$('#focusBtn').classList.toggle('active',autoFocus);render(+slider.value)};window.addEventListener('resize',()=>{clearTimeout(window.__rt);window.__rt=setTimeout(resize,90)});
 load().catch(err=>{console.error(err);$('#loading').innerHTML=`<div>Could not load atlas data.<small>${err.message}</small></div>`});
