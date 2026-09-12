@@ -13,18 +13,18 @@
     <div class="brand">
       <div class="eyebrow">Jewish demographic history · research prototype</div>
       <h1>Jewish Population Atlas</h1>
-      <p>Where Jewish and antecedent Israelite/Judahite populations lived — with uncertainty and changing source quality shown rather than hidden.</p>
+      <p>Where Jewish — and earlier Israelite/Judahite — communities lived, with source quality and uncertainty kept visible.</p>
     </div>
     <div class="controls">
-      <div class="seg"><span>Color by</span><button id="traditionBtn" class="active">Tradition</button><button id="languageBtn">Language</button></div>
-      <button id="focusBtn" class="focus active" title="Automatically zoom toward the active demographic centers">Auto focus</button>
+      <div class="dot-key"><i></i><b>1 dot = 1,000 people</b><span>where a numerical estimate exists</span></div>
+      <button id="focusBtn" class="focus active" title="Automatically zoom toward active demographic centers">Auto focus</button>
     </div>
   </header>
 
   <main class="stage" id="stage">
     <div class="mapwrap">
       <svg class="world" id="world" aria-label="World map"></svg>
-      <canvas class="heat" id="heat"></canvas>
+      <canvas class="dots" id="dots"></canvas>
       <div class="grain"></div>
       <svg class="labels" id="labels" aria-hidden="true"></svg>
     </div>
@@ -33,17 +33,24 @@
       <div class="yearblock">
         <div class="year" id="year">—</div>
         <div class="interp" id="interp">source snapshot</div>
-        <div class="total" id="total">—</div>
+        <section class="population-card">
+          <div class="population-title" id="totalTitle">World Jewish population</div>
+          <div class="total-number" id="totalNumber">—</div>
+          <div class="population-meter"><i id="totalBar"></i><span class="peak-mark" title="1939 historical peak in this series"></span></div>
+          <div class="total-meta" id="totalMeta"></div>
+        </section>
         <div class="quality" id="quality"></div>
       </div>
-      <div class="method-badge"><b>Color = historical tradition or language</b><br>Heat = relative concentration. Broad halos mean broad source geography, not low-resolution certainty.</div>
+
+      <div class="method-badge"><b>Dot-density, not a census map.</b><br>One full dot represents 1,000 people where a headcount exists. Wider clusters mean coarser geography. Hollow rings mark documented or reconstructed centers without a defensible population count.</div>
       <div class="legend" id="legend"></div>
+
       <article class="story" id="story">
         <div class="kicker" id="storyKicker"></div>
         <h2 id="storyTitle">Loading…</h2>
         <p id="storyText"></p>
         <div class="top-centers" id="topCenters"></div>
-        <div class="story-meta"><span></span><a class="source" id="source" target="_blank" rel="noopener">Source ↗</a></div>
+        <div class="story-meta"><span id="coverage"></span><a class="source" id="source" target="_blank" rel="noopener">Source ↗</a></div>
       </article>
     </div>
   </main>
@@ -51,7 +58,11 @@
   <footer class="timeline">
     <div class="timeline-row">
       <button class="play" id="play" aria-label="Play timeline">▶</button>
-      <div class="range-wrap"><div class="event-dots" id="eventDots"></div><input id="slider" type="range" min="0" max="11000" value="0" step="1" aria-label="Historical timeline"></div>
+      <div class="range-wrap">
+        <svg class="pop-spark" id="popSpark" viewBox="0 0 1000 48" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div class="event-dots" id="eventDots"></div>
+        <input id="slider" type="range" min="0" max="11000" value="0" step="1" aria-label="Historical timeline">
+      </div>
       <div class="counter" id="counter">—</div>
     </div>
     <div class="anchor-labels" id="anchorLabels"></div>
