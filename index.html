@@ -3,101 +3,62 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#f3efe7">
+<meta name="theme-color" content="#f4f0e7">
 <title>Jewish Population Atlas — A demographic map through time</title>
-<style>
-:root{
-  --ink:#18202a;--muted:#69727c;--paper:#f3efe7;--paper2:#ebe5da;--card:rgba(255,253,248,.88);
-  --line:rgba(35,43,51,.16);--accent:#9b3f32;--blue:#234b72;--gold:#b78835;
-}
-*{box-sizing:border-box}html,body{height:100%;margin:0}body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper);overflow:hidden}
-button,input{font:inherit}button{color:inherit}
-.app{height:100%;display:grid;grid-template-rows:auto 1fr auto;background:radial-gradient(circle at 25% 0%,#fffaf0 0,var(--paper) 42%,var(--paper2) 100%)}
-.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;padding:18px 24px 14px;border-bottom:1px solid var(--line);position:relative;z-index:20;background:rgba(243,239,231,.88);backdrop-filter:blur(16px)}
-.brand .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:700}.brand h1{font:500 clamp(27px,3.5vw,44px)/1.02 Georgia,"Times New Roman",serif;letter-spacing:-.025em;margin:4px 0 4px}.brand p{margin:0;color:var(--muted);font-size:13px}
-.mode-switch{display:flex;gap:4px;padding:4px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.5);margin-top:3px}.mode-switch button{border:0;background:transparent;padding:7px 11px;border-radius:999px;font-size:12px;cursor:pointer}.mode-switch button.active{background:#fff;box-shadow:0 2px 9px rgba(30,35,40,.1);font-weight:700}
-.stage{position:relative;min-height:0;overflow:hidden}.mapwrap{position:absolute;inset:0}.world,.heat{position:absolute;inset:0;width:100%;height:100%}.world{z-index:1}.heat{z-index:3;pointer-events:none;mix-blend-mode:multiply}.grain{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:.08;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.28'/%3E%3C/svg%3E")}
-.hud{position:absolute;inset:0;z-index:10;pointer-events:none}.yearblock{position:absolute;left:28px;top:24px;text-shadow:0 1px 0 rgba(255,255,255,.8)}.year{font:500 clamp(66px,9vw,126px)/.82 Georgia,"Times New Roman",serif;letter-spacing:-.055em}.interpolated{margin-top:10px;color:var(--muted);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700}.total{margin-top:12px;font-size:14px;color:var(--muted)}.total strong{color:var(--ink);font-size:23px;font-weight:650;letter-spacing:-.02em}
-.story{pointer-events:auto;position:absolute;right:24px;bottom:25px;width:min(390px,calc(100% - 48px));padding:17px 18px 16px;background:var(--card);border:1px solid rgba(255,255,255,.7);box-shadow:0 16px 50px rgba(35,39,43,.13);backdrop-filter:blur(18px);border-radius:15px;transition:opacity .35s ease,transform .35s ease}.story.swap{opacity:.15;transform:translateY(4px)}
-.story .date{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);font-weight:800}.story h2{font:500 23px/1.12 Georgia,"Times New Roman",serif;margin:5px 0 7px}.story p{font-size:13px;line-height:1.48;color:#4d555d;margin:0}.story .context{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:center}.confidence{font-size:11px;color:var(--muted)}.source{font-size:11px;color:var(--blue);text-decoration:none;white-space:nowrap}.source:hover{text-decoration:underline}
-.legend{position:absolute;left:28px;bottom:26px;display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;background:rgba(255,253,248,.68);border:1px solid rgba(255,255,255,.72);backdrop-filter:blur(12px);font-size:11px;color:var(--muted)}.gradient{width:98px;height:8px;border-radius:999px;background:linear-gradient(90deg,rgba(217,160,76,.08),rgba(229,130,61,.45),rgba(164,52,40,.92))}.legend strong{color:var(--ink);font-weight:650}
-.timeline{position:relative;z-index:20;border-top:1px solid var(--line);padding:12px 24px 14px;background:rgba(243,239,231,.9);backdrop-filter:blur(16px)}.timeline-row{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center}.play{width:42px;height:34px;border:1px solid var(--line);border-radius:9px;background:#fffaf3;cursor:pointer;font-weight:800}.play:hover{background:white}.range-wrap{position:relative;height:36px;display:flex;align-items:center}.range-wrap input{position:relative;z-index:3;width:100%;accent-color:var(--accent);cursor:pointer}.event-dots{position:absolute;left:0;right:0;top:5px;height:8px;z-index:2;pointer-events:none}.event-dot{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--accent);transform:translateX(-50%);opacity:.55}.event-dot.major{width:8px;height:8px;opacity:.9;top:-1px}.anchor-labels{display:flex;justify-content:space-between;color:var(--muted);font-size:9px;margin:1px 52px 0 56px;user-select:none}.counter{font-size:11px;color:var(--muted);min-width:72px;text-align:right}.method{position:absolute;right:24px;top:22px;z-index:11;font-size:11px;color:var(--muted);max-width:280px;text-align:right;line-height:1.35}.method b{color:var(--ink)}
-.loading{position:absolute;inset:0;z-index:50;display:grid;place-items:center;background:var(--paper);transition:opacity .45s ease}.loading.done{opacity:0;pointer-events:none}.loading div{font:500 22px Georgia,serif;color:var(--muted)}
-@media(max-width:760px){body{overflow:auto}.app{min-height:100%;height:auto;grid-template-rows:auto 67vh auto}.topbar{padding:14px 16px 12px;align-items:flex-end}.brand p{display:none}.mode-switch{transform:scale(.92);transform-origin:right bottom}.yearblock{left:16px;top:18px}.year{font-size:68px}.method{display:none}.story{right:14px;bottom:14px;width:calc(100% - 28px)}.legend{left:14px;bottom:205px}.timeline{padding:10px 14px 12px}.anchor-labels{display:none}.counter{min-width:52px}.story h2{font-size:20px}}
-</style>
+<link rel="stylesheet" href="app.css">
 </head>
 <body>
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="eyebrow">Jewish demographic history</div><h1>Jewish Population Atlas</h1><p>Where the Jewish world lived — and how its demographic center shifted through time.</p></div>
-    <div class="mode-switch" aria-label="Map scale"><button id="relativeBtn" class="active">Relative share</button><button id="absoluteBtn">Absolute population</button></div>
+    <div class="brand">
+      <div class="eyebrow">Jewish demographic history · research prototype</div>
+      <h1>Jewish Population Atlas</h1>
+      <p>Where Jewish and antecedent Israelite/Judahite populations lived — with uncertainty and changing source quality shown rather than hidden.</p>
+    </div>
+    <div class="controls">
+      <div class="seg"><span>Color by</span><button id="traditionBtn" class="active">Tradition</button><button id="languageBtn">Language</button></div>
+      <button id="focusBtn" class="focus active" title="Automatically zoom toward the active demographic centers">Auto focus</button>
+    </div>
   </header>
 
   <main class="stage" id="stage">
-    <div class="mapwrap"><svg class="world" id="world" aria-label="World map"></svg><canvas class="heat" id="heat"></canvas><div class="grain"></div></div>
-    <div class="loading" id="loading"><div>Building the atlas…</div></div>
+    <div class="mapwrap">
+      <svg class="world" id="world" aria-label="World map"></svg>
+      <canvas class="heat" id="heat"></canvas>
+      <div class="grain"></div>
+      <svg class="labels" id="labels" aria-hidden="true"></svg>
+    </div>
+    <div class="loading" id="loading"><div>Building the historical atlas…</div></div>
     <div class="hud">
-      <div class="yearblock"><div class="year" id="year">—</div><div class="interpolated" id="interp">source snapshot</div><div class="total">World Jewish population<br><strong id="total">—</strong></div></div>
-      <div class="method"><b>Heat = demographic concentration</b><br>Older geography is deliberately broader; transitions between source years are visual interpolations.</div>
-      <div class="legend"><span>lower</span><span class="gradient"></span><span><strong>higher concentration</strong></span></div>
-      <article class="story" id="story"><div class="date" id="storyDate"></div><h2 id="storyTitle">Loading…</h2><p id="storyText"></p><div class="context"><span class="confidence" id="confidence"></span><a class="source" id="source" target="_blank" rel="noopener">Source ↗</a></div></article>
+      <div class="yearblock">
+        <div class="year" id="year">—</div>
+        <div class="interp" id="interp">source snapshot</div>
+        <div class="total" id="total">—</div>
+        <div class="quality" id="quality"></div>
+      </div>
+      <div class="method-badge"><b>Color = historical tradition or language</b><br>Heat = relative concentration. Broad halos mean broad source geography, not low-resolution certainty.</div>
+      <div class="legend" id="legend"></div>
+      <article class="story" id="story">
+        <div class="kicker" id="storyKicker"></div>
+        <h2 id="storyTitle">Loading…</h2>
+        <p id="storyText"></p>
+        <div class="top-centers" id="topCenters"></div>
+        <div class="story-meta"><span></span><a class="source" id="source" target="_blank" rel="noopener">Source ↗</a></div>
+      </article>
     </div>
   </main>
 
   <footer class="timeline">
-    <div class="timeline-row"><button class="play" id="play" aria-label="Play timeline">▶</button><div class="range-wrap"><div class="event-dots" id="eventDots"></div><input id="slider" type="range" min="0" max="9000" value="0" step="1" aria-label="Historical timeline"></div><div class="counter" id="counter">1170</div></div>
+    <div class="timeline-row">
+      <button class="play" id="play" aria-label="Play timeline">▶</button>
+      <div class="range-wrap"><div class="event-dots" id="eventDots"></div><input id="slider" type="range" min="0" max="11000" value="0" step="1" aria-label="Historical timeline"></div>
+      <div class="counter" id="counter">—</div>
+    </div>
     <div class="anchor-labels" id="anchorLabels"></div>
   </footer>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
-<script>
-const STORY_EVENTS=[
-  {year:1170,title:'A predominantly Mediterranean and Middle Eastern Jewish world',text:'The earliest snapshot in this atlas is a broad reconstruction. Most of world Jewry is placed in Asia and Africa; the European populations are much smaller.',major:false},
-  {year:1492,title:'The expulsion from Spain reshapes Sephardi geography',text:'The Alhambra Decree forces Jews from the Spanish kingdoms. Sephardi communities disperse across the Ottoman world, North Africa, Italy, the Netherlands and beyond.',major:true},
-  {year:1648,title:'Violence in the Polish–Lithuanian Commonwealth',text:'The Khmelnytsky uprising and the wars around it devastate many Jewish communities. Even so, Eastern Europe continues to become the major demographic center of Jewish life.',major:false},
-  {year:1881,title:'Mass migration out of Eastern Europe accelerates',text:'Pogroms, legal restrictions and economic pressure coincide with a huge migration wave. Over the following decades, the United States becomes one of the principal centers of world Jewry.',major:true},
-  {year:1939,title:'The prewar demographic peak',text:'World Jewry reaches roughly 16.5 million in this reconstruction. Europe still contains the majority of Jews worldwide on the eve of the Holocaust.',major:true},
-  {year:1945,title:'The Holocaust destroys the historic European center',text:'Six million Jews are murdered. The demographic map of Jewish life is permanently transformed; the postwar population is dramatically smaller and far less European.',major:true},
-  {year:1948,title:'Israel becomes a new demographic pole',text:'The establishment of Israel and postwar migrations begin a rapid rebalancing of the Jewish world. In the following decades, large migrations from Europe, the Middle East and North Africa strengthen Israel dramatically.',major:true},
-  {year:1990,title:'Large-scale emigration from the former Soviet Union',text:'The opening of the Soviet Union produces another major redistribution, especially toward Israel, the United States and Germany.',major:false},
-  {year:2024,title:'Israel and North America dominate the contemporary map',text:'More than 85% of the world core Jewish population now lives in Israel and the United States. The global distribution is far more concentrated than it was before the twentieth century.',major:true}
-];
-
-const stage=document.getElementById('stage'),svg=d3.select('#world'),canvas=document.getElementById('heat'),ctx=canvas.getContext('2d');
-const slider=document.getElementById('slider'),playBtn=document.getElementById('play');
-let points=[],sources={},anchorEvents={},years=[],worldFeature=null,projection=null,path=null,mode='relative',playing=false,lastFrame=0;
-const fmt=n=>new Intl.NumberFormat('en-US',{maximumFractionDigits:0}).format(n);
-
-function parseCSV(text){const lines=text.trim().split(/\r?\n/),head=lines.shift().split(',');return lines.map(line=>{const out=[];let cur='',q=false;for(let i=0;i<line.length;i++){const c=line[i];if(c==='"'){if(q&&line[i+1]==='"'){cur+='"';i++}else q=!q}else if(c===','&&!q){out.push(cur);cur=''}else cur+=c}out.push(cur);return Object.fromEntries(head.map((h,i)=>[h,out[i]??'']))})}
-const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),smooth=t=>t*t*(3-2*t);
-
-function resize(){const r=stage.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(r.width*dpr);canvas.height=Math.round(r.height*dpr);canvas.style.width=r.width+'px';canvas.style.height=r.height+'px';ctx.setTransform(dpr,0,0,dpr,0,0);svg.attr('viewBox',`0 0 ${r.width} ${r.height}`);projection=d3.geoNaturalEarth1().fitExtent([[20,20],[r.width-20,r.height-18]],worldFeature);path=d3.geoPath(projection);drawBase();render(+slider.value)}
-function drawBase(){svg.selectAll('*').remove();svg.append('path').datum({type:'Sphere'}).attr('d',path).attr('fill','#e9e3d7');svg.append('path').datum(worldFeature).attr('d',path).attr('fill','#fffaf0').attr('stroke','#b9b1a5').attr('stroke-width',.55).attr('vector-effect','non-scaling-stroke');svg.append('path').datum(d3.geoGraticule10()).attr('d',path).attr('fill','none').attr('stroke','#c9c1b5').attr('stroke-width',.35).attr('opacity',.28)}
-function rowsFor(y){return points.filter(r=>+r.year===y)}
-function totalFor(y){return rowsFor(y).reduce((s,r)=>s+(+r.population||0),0)}
-function segmentFromPosition(pos){const raw=clamp(pos/1000,0,years.length-1),i=Math.min(Math.floor(raw),years.length-2),t=raw-i;return{i,t,y0:years[i],y1:years[i+1]}}
-function yearFromPosition(pos){if(pos>=slider.max)return years.at(-1);const {t,y0,y1}=segmentFromPosition(pos);return Math.round(y0+(y1-y0)*t)}
-function positionForYear(y){if(y<=years[0])return 0;if(y>=years.at(-1))return (years.length-1)*1000;for(let i=0;i<years.length-1;i++)if(y>=years[i]&&y<=years[i+1])return i*1000+1000*(y-years[i])/(years[i+1]-years[i]);return 0}
-
-function precisionRadius(r,w){const macro=r.place_type==='macroregion'||String(r.geographic_precision).includes('macroregion');const region=r.place_type==='region';const base=macro?Math.min(165,w*.15):region?Math.min(105,w*.095):72;return base}
-function drawHeatRows(rows,total,alpha,w,h){if(!rows.length||!alpha)return;ctx.save();ctx.globalCompositeOperation='multiply';for(const r of rows){const p=projection([+r.lon,+r.lat]);if(!p)continue;const pop=+r.population||0,share=total?pop/total:0;const strength=mode==='relative'?Math.sqrt(share):Math.sqrt(pop/8000000);const radius=precisionRadius(r,w)*(0.76+0.56*Math.sqrt(Math.max(share,.01)));const a=clamp(alpha*(.18+.76*strength),.03,.82);const g=ctx.createRadialGradient(p[0],p[1],0,p[0],p[1],radius);g.addColorStop(0,`rgba(143,38,32,${a})`);g.addColorStop(.24,`rgba(190,65,38,${a*.82})`);g.addColorStop(.55,`rgba(226,124,55,${a*.56})`);g.addColorStop(.82,`rgba(225,171,84,${a*.25})`);g.addColorStop(1,'rgba(225,171,84,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(p[0],p[1],radius,0,Math.PI*2);ctx.fill()}ctx.restore()}
-function confidenceLabel(c0,c1,t){const rank={low:0,medium:1,high:2},labels=['LOW historical certainty','MEDIUM historical certainty','HIGHER demographic certainty'];const n=Math.round((1-t)*(rank[c0]??1)+t*(rank[c1]??1));return labels[n]}
-function dominantConfidence(rows){if(rows.some(r=>r.confidence==='low'))return'low';if(rows.some(r=>r.confidence==='medium'))return'medium';return'high'}
-function eventForYear(y){let chosen=STORY_EVENTS[0];for(const e of STORY_EVENTS){if(e.year<=y)chosen=e;else break}return chosen}
-function updateStory(y,segment,t){const e=eventForYear(y),box=document.getElementById('story');if(box.dataset.event!==String(e.year)){box.classList.add('swap');setTimeout(()=>{document.getElementById('storyDate').textContent=e.year;document.getElementById('storyTitle').textContent=e.title;document.getElementById('storyText').textContent=e.text;box.dataset.event=e.year;box.classList.remove('swap')},130)}
-const r0=rowsFor(segment.y0),r1=rowsFor(segment.y1),c=confidenceLabel(dominantConfidence(r0),dominantConfidence(r1),t);document.getElementById('confidence').textContent=(t>.015&&t<.985?'Visual interpolation · ':'')+c.toLowerCase();const nearest=t<.5?r0:r1,s=sources[nearest[0]?.source_key],a=document.getElementById('source');if(s){a.href=s.url;a.textContent='Source ↗'}else{a.removeAttribute('href');a.textContent=''}}
-function render(pos){if(!years.length||!projection)return;const w=stage.clientWidth,h=stage.clientHeight;ctx.clearRect(0,0,w,h);let seg,t,y;if(+pos>=+slider.max){seg={i:years.length-2,t:1,y0:years.at(-2),y1:years.at(-1)};t=1;y=years.at(-1)}else{seg=segmentFromPosition(pos);t=smooth(seg.t);y=yearFromPosition(pos)}const r0=rowsFor(seg.y0),r1=rowsFor(seg.y1),tot0=totalFor(seg.y0),tot1=totalFor(seg.y1);drawHeatRows(r0,tot0,1-t,w,h);drawHeatRows(r1,tot1,t,w,h);const total=Math.round(tot0+(tot1-tot0)*t),isAnchor=Math.abs((+pos)%1000)<3||+pos>=+slider.max;document.getElementById('year').textContent=y;document.getElementById('total').textContent=(isAnchor?'':'≈ ')+fmt(total);document.getElementById('interp').textContent=isAnchor?'source snapshot':`visual transition · ${seg.y0} → ${seg.y1}`;document.getElementById('counter').textContent=y;updateStory(y,seg,t)}
-
-function setupTimeline(){slider.max=(years.length-1)*1000;document.getElementById('anchorLabels').innerHTML=years.map(y=>`<span>${y}</span>`).join('');const dots=document.getElementById('eventDots');dots.innerHTML='';for(const e of STORY_EVENTS){if(e.year<years[0]||e.year>years.at(-1))continue;const d=document.createElement('span');d.className='event-dot'+(e.major?' major':'');d.style.left=(100*positionForYear(e.year)/slider.max)+'%';d.title=`${e.year} — ${e.title}`;dots.appendChild(d)}}
-function animate(ts){if(!playing)return;if(!lastFrame)lastFrame=ts;const dt=Math.min(40,ts-lastFrame);lastFrame=ts;let v=+slider.value+dt/2.9;if(v>=+slider.max){v=+slider.max;playing=false;playBtn.textContent='▶';lastFrame=0}slider.value=v;render(v);if(playing)requestAnimationFrame(animate)}
-function setMode(next){mode=next;document.getElementById('relativeBtn').classList.toggle('active',mode==='relative');document.getElementById('absoluteBtn').classList.toggle('active',mode==='absolute');render(+slider.value)}
-
-slider.addEventListener('input',()=>{playing=false;playBtn.textContent='▶';lastFrame=0;render(+slider.value)});playBtn.addEventListener('click',()=>{playing=!playing;playBtn.textContent=playing?'❚❚':'▶';if(playing){if(+slider.value>=+slider.max)slider.value=0;lastFrame=0;requestAnimationFrame(animate)}});document.getElementById('relativeBtn').onclick=()=>setMode('relative');document.getElementById('absoluteBtn').onclick=()=>setMode('absolute');
-
-async function init(){const [pc,sc,world]=await Promise.all([fetch('population_points.csv').then(r=>r.text()),fetch('sources.csv').then(r=>r.text()),fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r=>r.json())]);points=parseCSV(pc);parseCSV(sc).forEach(s=>sources[s.source_key]=s);years=[...new Set(points.map(r=>+r.year))].sort((a,b)=>a-b);worldFeature=topojson.feature(world,world.objects.countries);setupTimeline();resize();new ResizeObserver(resize).observe(stage);document.getElementById('loading').classList.add('done')}
-init().catch(e=>{document.getElementById('loading').innerHTML=`<div>Could not load the atlas: ${e.message}</div>`});
-</script>
+<script src="app.js"></script>
 </body>
 </html>
