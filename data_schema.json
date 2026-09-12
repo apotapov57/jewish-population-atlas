@@ -1,0 +1,16 @@
+{
+  "year": "integer anchor year",
+  "place_name": "display name of region/place",
+  "place_type": "macroregion | region | country | city (future)",
+  "lat": "schematic or exact latitude depending on geographic_precision",
+  "lon": "schematic or exact longitude depending on geographic_precision",
+  "population": "estimated core Jewish population / historical estimate in persons",
+  "lower_bound": "optional uncertainty bound",
+  "upper_bound": "optional uncertainty bound",
+  "confidence": "editorial confidence label: low | medium | high",
+  "source_key": "foreign key into sources.csv",
+  "methodology": "how the point was derived",
+  "geographic_precision": "explicit spatial precision / warning",
+  "demographic_precision": "type/quality of estimate",
+  "notes": "free-text limitations"
+}
