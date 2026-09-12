@@ -4,19 +4,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#f4f0e7">
-<title>Jewish Population Atlas — A demographic map through time</title>
+<title>Jewish Population Atlas — Communities through time</title>
 <link rel="stylesheet" href="app.css">
 </head>
 <body>
 <div class="app">
   <header class="topbar">
     <div class="brand">
-      <div class="eyebrow">Jewish demographic history · research prototype</div>
+      <div class="eyebrow">Jewish demographic history · visual reconstruction</div>
       <h1>Jewish Population Atlas</h1>
-      <p>Where Jewish — and earlier Israelite/Judahite — communities lived, with source quality and uncertainty kept visible.</p>
+      <p>Watch Jewish communities form, disperse, migrate — and partially reconverge in Israel and other modern centers.</p>
     </div>
     <div class="controls">
-      <div class="dot-key"><i></i><b>1 dot = 1,000 people</b><span>where a numerical estimate exists</span></div>
+      <div class="dot-key"><i></i><b>1 dot = 1,000 people</b><span>same visual rule across all eras</span></div>
       <button id="focusBtn" class="focus active" title="Automatically zoom toward active demographic centers">Auto focus</button>
     </div>
   </header>
@@ -32,7 +32,7 @@
     <div class="hud">
       <div class="yearblock">
         <div class="year" id="year">—</div>
-        <div class="interp" id="interp">source snapshot</div>
+        <div class="interp" id="interp">continuous lineage reconstruction</div>
         <section class="population-card">
           <div class="population-title" id="totalTitle">World Jewish population</div>
           <div class="total-number" id="totalNumber">—</div>
@@ -42,7 +42,7 @@
         <div class="quality" id="quality"></div>
       </div>
 
-      <div class="method-badge"><b>Dot-density, not a census map.</b><br>One full dot represents 1,000 people where a headcount exists. Wider clusters mean coarser geography. Hollow rings mark documented or reconstructed centers without a defensible population count.</div>
+      <div class="method-badge"><b>One visual grammar from antiquity to today.</b><br>Each full dot = 1,000 people. Early distributions are plausible hypotheses rather than census claims. Dot positions are constrained to land; long migrations crossfade between source and destination instead of drifting through the sea.</div>
       <div class="legend" id="legend"></div>
 
       <article class="story" id="story">
@@ -50,7 +50,7 @@
         <h2 id="storyTitle">Loading…</h2>
         <p id="storyText"></p>
         <div class="top-centers" id="topCenters"></div>
-        <div class="story-meta"><span id="coverage"></span><a class="source" id="source" target="_blank" rel="noopener">Source ↗</a></div>
+        <div class="story-meta"><span id="coverage"></span><a class="source" id="source" target="_blank" rel="noopener">Methodology ↗</a></div>
       </article>
     </div>
   </main>
@@ -61,7 +61,7 @@
       <div class="range-wrap">
         <svg class="pop-spark" id="popSpark" viewBox="0 0 1000 48" preserveAspectRatio="none" aria-hidden="true"></svg>
         <div class="event-dots" id="eventDots"></div>
-        <input id="slider" type="range" min="0" max="11000" value="0" step="1" aria-label="Historical timeline">
+        <input id="slider" type="range" min="0" max="37000" value="0" step="1" aria-label="Historical timeline">
       </div>
       <div class="counter" id="counter">—</div>
     </div>
