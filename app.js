@@ -25,7 +25,7 @@ async function load(){
     fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r=>r.json())
   ]);
   const atlas=rest.pop();meta=metaData;lineages=rest;worldFeature=topojson.feature(atlas,atlas.objects.countries);
-  for(const l of lineages)l.maxDots=Math.ceil(Math.max(...l.keyframes.map(k=>k.population||0))/DOT_VALUE);
+  for(const l of lineages)l.maxDots=Math.ceil(Math.max(...l.keyframes.map(k=>k.population||0))*2.2/DOT_VALUE);
   slider.min=0;slider.max=(TIMELINE_YEARS.length-1)*1000;slider.value=0;
   buildTimeline();buildLegend();drawSpark();resize();render(0);$('#loading').classList.add('done');
 }
