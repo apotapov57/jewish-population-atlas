@@ -1,103 +1,154 @@
-# Jewish Population Atlas — v0.1
+# Jewish Population Atlas — v0.4 dot-density prototype
 
-A small interactive prototype for exploring **where the world's Jewish population was concentrated through time**.
+An interactive research prototype for exploring **where Jewish populations lived through time, how demographic centers shifted, and how large historical shocks changed the world Jewish population**.
 
-## What this version contains
+Live site: https://apotapov57.github.io/jewish-population-atlas/
 
-Ten anchor years:
+## Current visual model
 
-**1170, 1300, 1490, 1700, 1825, 1880, 1939, 1948, 1995, 2024**
+The atlas now uses a **dot-density map** rather than bubbles or a heatmap.
 
-The historical backbone is Sergio DellaPergola's published regional series for 1170–1995. The 2024 snapshot uses the modern regional estimates in *World Jewish Population, 2024*.
+- **1 full dot = 1,000 people** whenever the source provides a numeric population estimate.
+- A fractional final dot represents the remaining fraction of 1,000.
+- **Hollow rings** mark historically documented or reconstructed centers for which we do not have a defensible headcount.
+- Dots around cities are tightly packed around the city coordinate.
+- Governorate, republic, country and regional estimates are deliberately dispersed around a centroid. They show the source's geographical precision and **must not be read as exact household locations**.
+- Color represents **historical community/tradition**, not language and not race.
 
-The browser UI includes:
+The interface also reports how much of the source-period world total has actually been numerically localized on the map. A 1939 total of 16.5 million, for example, does not imply that every one of those 16.5 million people has city-level coordinates in the current dataset.
 
-- an interactive world map;
-- proportional population bubbles;
-- a draggable year slider;
-- autoplay;
-- world-population total;
-- share of world Jewry for each displayed region;
-- a confidence legend;
-- short historical annotations;
-- direct source links.
+## Historical community categories
 
-## The most important methodological rule
+The analytical color layer currently includes:
 
-**The map never claims more spatial precision than the source provides.**
+- Israelite / Judahite
+- Judean / Palestinian
+- Babylonian
+- Hellenistic / Romaniote
+- Ashkenazi
+- Sephardi
+- Judeo-Arabic / Maghrebi
+- Persian / Central Asian
+- Yemenite
+- Modern Israeli (mixed)
+- Mixed diaspora
 
-For 1170–1995 the source is a macro-regional demographic reconstruction. A bubble is therefore placed at a **schematic centroid** for that macro-region. It must not be interpreted as saying that the population physically lived at that point.
+These categories change with historical period. The project deliberately does **not** project later categories such as Ashkenazi or Sephardi backward into Iron Age Judea.
 
-For 2024 the source has much finer modern geography, so the UI can show several regions separately.
+## Current anchor layers
 
-This is deliberate. DellaPergola explicitly describes the long-run historical evidence as combining documented scholarship with raw data, inference, literary memory and reconstruction, and notes that medieval evidence is fragmentary and of unequal quality.
+The working timeline now includes ancient, medieval, early-modern, modern-European and contemporary layers, including:
 
-## Confidence labels
+- c. 800 BCE — Israel and Judah archaeological demographic reconstruction
+- c. 450 BCE — Yehud, Babylonia and Elephantine
+- c. 50 CE — Palestine, Alexandria and other major ancient centers
+- c. 500 CE — late-antique documented/reconstructed centers
+- c. 1170 — Benjamin of Tudela city observations
+- c. 1490 — pre-expulsion community geography
+- 1750 and 1850 — selected European community estimates
+- **1897 — Russian Empire Pale of Settlement census by governorate**
+- 1930 — selected major European communities from the IIJG map series
+- 1939 — world prewar peak, with 1930 city geography used transparently as a spatial proxy
+- **1945 — world population collapse after the Holocaust**
+- 1950 — early postwar redistribution
+- 1970 — USSR census layer by republic
+- **1989 — USSR census by republic immediately before mass emigration**
+- **1991 — post-Soviet redistribution layer**
+- 1995
+- 2024
 
-The `confidence` field is an **editorial visualization aid created for this prototype**, not a confidence interval reported by DellaPergola.
+## Historical event layer
 
-- `low`: medieval reconstructions (1170–1490)
-- `medium`: early-modern / early statistical reconstruction (1700–1825)
-- `high`: late-19th century onward
+Autoplay is intentionally slower and pauses at important events. Current annotations include:
 
-A later version should replace these simple labels with source-specific uncertainty metadata and, where scholarship supports it, numeric ranges.
+- Assyrian conquest of Israel
+- Babylonian destruction / exile
+- destruction of the Second Temple
+- Benjamin of Tudela
+- 1492 expulsion from Spain
+- 1648 wars in the Polish–Lithuanian Commonwealth
+- **1772, 1793 and 1795 Partitions of Poland**
+- **1791 formation of the legal geography that becomes the Pale of Settlement**
+- 1881 migration wave
+- 1882 May Laws
+- **1897 Pale of Settlement census**
+- 1903 Kishinev pogrom
+- 1917 abolition of the Pale
+- 1939 prewar peak
+- 1941 expansion of the Holocaust into the occupied Soviet territories
+- **1945 demographic collapse**
+- 1948 establishment of Israel
+- 1970s Soviet Jewish emigration / refusenik era
+- **1989–1991 mass emigration from the USSR / former USSR**
 
-## Data provenance
+## Population totals
 
-### 1. Historical regional backbone
-Sergio DellaPergola, *Some Fundamentals of Jewish Demographic History* (2001), Table 2.
+The large population readout and the small population curve in the timeline are intended to make long-run demographic change legible. The current source-backed modern series includes, among other anchors:
 
-https://www.bjpa.org/content/upload/bjpa/dell/DellaPergola%20Some%20Fundamentals.pdf
+- 1939: ~16.5 million
+- May 1945: ~11.0 million
+- 1950: ~11.297 million
+- 1970: ~12.585 million
+- 1989: ~12.810 million
+- 1995: ~13.059 million
+- 2024: ~15.737 million core Jewish population
 
-The table reports estimates for total world Jewry and four macro-regions for 1170, 1300, 1490, 1700, 1825, 1880, 1939, 1948 and 1995.
+Transitions between source years are visual interpolations and are explicitly labelled as such; they are **not claims of annual census estimates**.
 
-### 2. Current snapshot
-Sergio DellaPergola, *World Jewish Population, 2024*, American Jewish Year Book 2024 (published 2025), Table 8.2.
+## Major data sources
 
-https://www.cbs.gov.il/he/Documents/World%20DellaPergola%202024%20complete.pdf
+### Long-run demography
+Sergio DellaPergola, *Some Fundamentals of Jewish Demographic History* and later *World Jewish Population* reports.
 
-World core Jewish population at 1 Jan 2024: **15,736,800**.
+### Europe, 1750–1950
+International Institute for Jewish Genealogy (IIJG), Laurence Leitenberg & Sandra Crystall, *Maps of Jewish Communities and their Populations in Europe: 1750–1950*.
 
-### 3. Historical uncertainty / interpretation
-Sergio DellaPergola, *Notes toward a Demographic History of the Jews* (2024).
+The underlying IIJG project covers **827 European communities** appearing in one or more of six historical snapshots. The current repository still contains only a subset of those localities; full ingestion remains a major next data task.
 
-https://www.mdpi.com/2313-5778/8/1/2
+### Pale of Settlement, 1897
+1897 Russian Empire census data summarized in Irena Grosfeld, Alexander Rodnyansky & Ekaterina Zhuravskaya, including 4,483,300 Jews across the Pale / Congress Poland table used in the current map.
 
-### 4. Planned city-level European enrichment
-International Institute for Jewish Genealogy, *Maps of Jewish Communities and their Populations in Europe: 1750–1950*.
+### Soviet period
+Soviet census data by republic for 1959, 1970, 1979 and 1989, plus post-Soviet demographic estimates.
 
-https://iijg.org/tools-and-technologies/maps-of-jewish-communities/
+### Emigration from the former Soviet Union
+Mark Tolts, *A Half Century of Jewish Emigration from the Former Soviet Union* and related demographic sources.
 
-IIJG maps population data for **827 European communities** in one or more of the years 1750, 1800, 1850, 1900, 1930 and 1950. This should become the first high-resolution historical layer.
+### Ancient layers
+Broshi & Finkelstein; University of Haifa *Mapping the Ancient Jewish World*; Cambridge historical demographic work; Persian-period archaeological studies.
 
-## Definition warning
+### Medieval layer
+Benjamin of Tudela, combined with later demographic scholarship.
 
-Modern DellaPergola estimates use the concept of the **core Jewish population** and apply a consistent methodology across contemporary countries. Historical estimates across many centuries cannot be treated as if they came from one modern census system.
+## Core methodological rules
 
-The atlas should therefore remain a visualization of the **best available demographic reconstruction at each period**, with provenance visible to the user.
+1. **Never turn presence evidence into a fake population count.** If we know a community existed but do not have a defensible number, show presence/reconstruction rather than invented dots.
+2. **Never imply finer geography than the source supports.** A governorate-level census is dispersed within a governorate-scale visual cluster, not placed as if everyone lived in the capital.
+3. **Keep world totals separate from mapped coverage.** A world estimate and a city-level database answer different questions.
+4. **Show interpolation as interpolation.** Smooth animation is a visual device, not annual historical data.
+5. **Keep community categories historically contextual.** Later Jewish traditions are not retrojected unchanged into antiquity.
 
-## Files
+## Repository structure
 
-- `index.html` — interactive prototype; open in a modern browser
-- `population_points.csv` — source-backed population points
-- `sources.csv` — bibliography / provenance
-- `events.json` — short narrative annotations
-- `data_schema.json` — proposed reusable schema
+- `index.html` — UI shell
+- `app.css` — visual design
+- `app.js` — map, dot-density engine, interpolation and story timeline
+- `data/config.json` — traditions, sources and dot quantum
+- `data/ancient.json` — ancient layers
+- `data/medieval.json` — medieval / early-modern layers
+- `data/europe_v4.json` — Europe, Pale, prewar and immediate postwar layers
+- `data/modern_v4.json` — USSR / FSU and modern layers
+- older v0.1 files remain temporarily for provenance during migration
 
-## Next iterations
+## Next data work
 
-1. Add IIJG's 1750–1950 European community layer.
-2. Add country-level modern data for 1950–2024.
-3. Separate Palestine/Israel, Asia, and Africa for more historical anchor years where sources support it.
-4. Add migration/event overlays as a separate layer — never as a substitute for population data.
-5. Add uncertainty ranges and competing scholarly estimates.
-6. Add a toggle between:
-   - **population bubbles**
-   - **share of world Jewry**
-   - **population density**
-   - **migration/events**
-7. Extend backward before 1170 only with a clearly different “reconstructed ancient presence” mode.
+The largest remaining improvement is **full community-level ingestion**, especially:
+
+1. IIJG's 827 European communities for 1750 / 1800 / 1850 / 1900 / 1930 / 1950.
+2. Better internal geography for the United States, Israel, France, Canada, the UK and Latin America after 1950.
+3. More locality-level Soviet census / community geography where defensible.
+4. More source-backed ancient and medieval locality estimates without manufacturing precision.
 
 ## Status
 
-This is a **research prototype**, not a finished demographic database. The numbers used in v0.1 are traceable to the cited sources; the map coordinates for macro-regions are intentionally schematic.
+This remains a **research prototype**, not a finished historical-demographic database. Its primary design goal is to make uncertainty visible while still allowing the viewer to perceive the dramatic relocation and demographic transformation of Jewish populations over roughly three millennia.
